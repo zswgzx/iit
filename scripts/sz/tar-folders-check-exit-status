@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# tar unused TORTOISE generated folders for all subjects
+
+SUBJECTS=`cat subjects-all`
+FOLDERS2TAR=`cat folders2tar`
+
+for sub in $SUBJECTS;do
+
+    cd $sub/${sub}_proc
+    for folder in $FOLDERS2TAR;do
+
+	# time to tar:
+	# DMC_corims/ 		< 20 secs
+	# slices/		< 20 secs
+	# DMC_noise_info/	< 30 secs
+	# up_RAWFLOAT/		< 45 secs
+	# up_rpd_corims/	< 25 secs
+
+        tar cfz ${sub}_$folder.tgz ${sub}_$folder/
+        OUT=$?				# check exit status
+        if [ $OUT -eq 0 ] ;then
+            rm -r ${sub}_$folder/	# remove if tar was successful
+        fi
+    done
+
+    cd ../..
+    echo $sub done
+done

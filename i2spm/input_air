@@ -1,0 +1,8 @@
+I.              cprefix (for I.xxx file)
+.s                    csuffix (for I.xxx.sxxx file)
+0                     header size for input files 
+256                   xres
+256                   yres
+45                   zres
+12                    # of diffus.directions
+

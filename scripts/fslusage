@@ -1,0 +1,11 @@
+1. convert image to float:
+
+fslmaths [raw] [output]
+
+observed changes in header: data_type (also datatype, nbyper, bitpix), pixdim(>=5), slice_{dim,name,code,end}, descrip; could be more
+
+2. crop image: fslroi or robustfov
+
+3. smooth image with gaussian kernel:
+
+fslmaths -s [(FWHM in mm)/2.3548]

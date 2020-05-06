@@ -1,0 +1,2 @@
+pr -m -t -s hiv race > hiv-mul-race
+cat hiv-mul-race | awk '{print $1*$2}' > test1

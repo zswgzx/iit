@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for sub in `cat ~/work/dti-t1-wmh/notes/subjects-all-sorted.txt`; do
+    echo "$sub:"
+    cat QCReports/$sub-dwi_QCReport.txt | grep "Gradient#:" -m 1 -A 3 # -m option to specify how many times to match, -A option shows # lines after the match string
+    #read -p "$*" # pause and wait for any input to resume
+
+done

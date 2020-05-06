@@ -1,0 +1,19 @@
+# this script change the value of default protocol to [subject]-protocol-new.xml
+# The changes are made for IMAGE_bCheck, DIFFUSION_bCheck, EDDYMOTION_bCheck,
+# and GRADIENT_bCheck, all from 'Yes' to 'No'. 
+
+# ref link: http://www.unix.com/shell-programming-scripting/53476-can-sed-substitute-word-specific-line.html
+
+for sub in `cat subjects0`;do
+
+    # IMAGE_bCheck in line 19, DIFFUSION_bCheck line 63, etc.
+    sed -e "19s/Yes/No/" $sub-protocol.xml > $sub-protocol1.xml 
+    sed -e "63s/Yes/No/" $sub-protocol1.xml > $sub-protocol2.xml
+    sed -e "480s/Yes/No/" $sub-protocol2.xml > $sub-protocol1.xml
+    sed -e "510s/Yes/No/" $sub-protocol1.xml > $sub-protocol2.xml
+
+    mv $sub-protocol2.xml $sub-protocol-new.xml
+    rm $sub-protocol1.xml
+
+    printf "%s done\n" $sub
+done

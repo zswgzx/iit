@@ -1,0 +1,29 @@
+for sub in `cat ../subjects-2b-QA.txt`;do
+
+    fslstats -t $sub/$sub-12b0s -k $sub/$sub-12b0s_mask -M -S > $sub/nonzero-mean-std-b0s
+
+    for i in {0..11}; do
+	ii=`printf "%02d" $i`
+        fslstats -t $sub/$sub-dw$ii -k $sub/$sub-dw${ii}_mask -M -S > $sub/nonzero-mean-std-dw$ii
+    done
+
+    fslstats $sub/$sub-chisq -M -S > $sub/nonzero-mean-std-chisq
+
+# calculate std of the mean values (in 1st column of nonzero-mean-std-...) across volumes, as well as SNR (mean/std), by awk
+    awk '{print $1}' $sub/nonzero-mean-std-b0s | awk '{sum+=$1; sumsq+=$1*$1;} END {print sqrt((sumsq - sum*sum/NR)/(NR-1));}' > $sub/std-b0s
+
+    awk '{tmp=$1/$2;printf "%f\n", tmp;}' $sub/nonzero-mean-std-b0s > $sub/snr-b0s
+
+    for i in {0..11}; do
+	ii=`printf "%02d" $i`
+	if [ $ii = "00" ]; then
+            awk '{print $1}' $sub/nonzero-mean-std-dw$ii | awk '{sum+=$1; sumsq+=$1*$1;} END {print sqrt((sumsq - sum*sum/NR)/(NR-1));}' > $sub/std-dws
+	else
+            awk '{print $1}' $sub/nonzero-mean-std-dw$ii | awk '{sum+=$1; sumsq+=$1*$1;} END {print sqrt((sumsq - sum*sum/NR)/(NR-1));}' >> $sub/std-dws
+	fi
+
+	awk '{tmp=$1/$2;printf "%f\n", tmp;}' $sub/nonzero-mean-std-dw$ii > $sub/snr-dw$ii
+    done
+
+    printf "%s done\n" $sub
+done

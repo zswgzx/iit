@@ -1,0 +1,45 @@
+action					command
+
+add/concatenate columns			"printf" (see add-column-to-text) or "pr -m -t -s [file with col1,2,...]" OR "paste -d[separator] [files]"
+make/dereference array elements		${array_name[i]} (see array.sh)
+add zeros to digits			"printf "%0[total no. chars]d" $variable"
+c style for loop			"for ((j=1;j<=$n;j++)) "
+calculator by bc			"bc <<< "scale=3;5/8" "
+change date format (e.g. to YYMMDD)	"date -d <input> +%y%m%d"
+check commond lines between files	"comm ..."
+check difference between folders	"diff -r $folder1 $folder2"
+check environment variables		"env"
+check exit status of previous command	"if [ "$?" -eq 0 ] ..." (if prev. command successful,...)
+check command history			"history"
+compare integers in if statment		" [ $var -gt "1"] " (test if var is >1)
+compare float numbers in if statement	" [ `echo "$var1 > $var2" | bc -l` = "1" ] " (this compares if var1 > var2) (note that space should be added after the begining braket and before the ending one!)
+convert upper case to lower		"lower="${UPPER,,}" "
+display match pattern only		"grep -o"
+extract sub-string			" substring=${rawstring:[no. start from 0]:[length]}" or "cut -c [start position, begin from 1]-[end]"
+find broken symbolic links		"find . -xtype l" or "find -L . -type l"
+find empty folder			"find . -type d -empty"
+inverse match				"grep -v"
+lists of numbers in for loop		"for var in {[no. start]..[no. end]..[no. interval]}"
+lists of command line args in for loop	"for var in "$@" ..."
+make soft link				"ln -s $file"
+multi test conditions			" [ cond.1 ] && [ cond.2 ] ..."
+output lines starting from Kth		"tail -n +2 $file" (output from 2nd to last line of file)
+pause and wait for input to resume	"read -p "$*" "
+print field separated by sepatator	"awk -F[separator] '{print $[field #]}' "
+process report				"ps -p [PID] -o [comm/pid/etc.]= -C [command name]"
+random permutation in customized range	"shuf -i LO-HI"
+remove file extension in variable	"no_extension = "${with_ext%.*}" " (search parameter expansion for details; single percent for the shortest suffix, double for the longest)
+remove prefix in variable		"no_prefix = "${with_prefix#*[prefix]}" "
+replace character			"tr ' ' '\n' < $text" (replace space w/ newline)
+replace single space before txt		"sed 's/^ //g' txtfile"
+rename multiple filenames		"find -name "161019_07_49094576*" -exec bash -c 'mv "$0" "${0/76/78}"' {} ";" "
+or find . -depth -iname "*01_78315445*"|rename -v (-n for dry run) 's/01_78315445/00_78315445/g' (both sub/folder and files)
+remove sections from each line of files "cut -d"[separator]" -f[selected field]"
+search unique/duplicate lines		"uniq -c -d" or "sort -u"
+sort by column N			"sort -kN"
+sort by numerical value 		"sort -g"
+test string matching			" [ string = "content_to_match" ] "
+unzip match files from archive		"unzip -q [zipfile] "[pattern]" "
+unzip without archive folder structure	"unzip -j [zipfile] [matching pattern]"
+untar similar to above			"tar xfz [tgz file] --xform='s#^.+/##x'" (note that folder still exists but empty)
+value self-increase			"let "a+=1" " (note that no need to add '$' before var.)

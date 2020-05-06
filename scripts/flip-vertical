@@ -1,0 +1,7 @@
+
+xres=`fslval SE000003_DMC_R1_AM.img dim1`
+yres=`fslval SE000003_DMC_R1_AM.img dim2`
+zres=`fslval SE000003_DMC_R1_AM.img dim3`
+
+./FlipFloatVerticalAxialSlices SE000003_DMC_R1_AM.img test.img $xres $yres $zres
+

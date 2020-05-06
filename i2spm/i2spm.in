@@ -1,0 +1,82 @@
+# i2spm.in
+#
+# This file contains information vital for the i2spm program,
+# which converts GE I.* files and epirecon I.* files to SPM-
+# compatible Analyze format.
+#
+# Note: Data files are written in the native byte order for SPM
+# compatibility. The Analyze file format contains no byte order
+# info in the header, and SPM expects native byte order when it
+# opens files.
+
+# Image slice file header size
+HDRSIZE 0
+
+# Slice files; include path if necessary (usually not). Typically,
+#   I.%03i.s%02i  for EPI  (TIMEPTS must be > 1 for 2 %i specifiers;
+#                           the first is time, the second slice)
+#   I.%03i        for anat (TIMEPTS must be 1 for 1 %i specifier,
+#                           which is slice number)
+# Examples:
+# INFILEMASK /atlas2/rogers/spm/jdesousa/S7/I.%03i.s%02i
+# INFILEMASK I.%03i.s%02i
+INFILEMASK meanDW%03i.img
+
+# Output file(s); as above. Typically,
+#   S5-motor.%03i  for EPI
+#   S2-spgr       for anat
+# The extensions .img and .hdr are always automatically added.
+OUTFILEMASK meanDW_spm
+
+# Number of slices (also change the appropriate one of PIXEL_X,
+# PIXEL_Y, or PIXEL_Z if you change this!)
+SLICES 141
+
+# Total number of time points, including the ones you'll ignore
+TIMEPTS 1
+
+# Ignore this many time points at the beginning; 0 to use them all
+TIGNORE 0
+
+# Slice axis (COR, AXI, SAG)
+AXIS AXI
+
+# Number of pixels in each direction:
+#  X is right to left
+#  Y is anterior to posterior
+#  Z is inferior to superior 
+# One of these should be the same as SLICES.
+PIXEL_X 256
+PIXEL_Y 256
+PIXEL_Z 141
+
+# Orientation and origin info; extent is from voxel edge
+# to voxel edge in the slice plane (i.e., FOV), and from
+# center to center along the slice axis.
+# Numbers are mm.
+#
+# The conversion to spm format uses this info to find
+# the voxel size and the data file byte sequence; the
+# conversion to afni format uses it to determine the origin.
+#
+# Order matters! For example, putting 120R-120L when it
+# should be 120L-120R flips the image left-right. Use R-L,
+# A-P, and S-I for the two axes you don't know from the
+# scan info sheet.
+#
+# X is the sagittal axis, Y the coronal, and Z the axial.
+XRANGE 120L-120R
+YRANGE 120P-120A
+ZRANGE 61.25I-70.0S
+
+# SPM file scale factor. Generally, use 1.
+SCALE 1
+
+# Set OVERWRITE to YES to overwrite existing output files
+# if you're running i2spm a second time. Set to NO to avoid
+# overwriting. Do not comment this line out, though.
+OVERWRITE YES
+
+# Data type (only SHORT).
+DATUM SHORT
+

@@ -1,0 +1,3 @@
+for sub in `cat subj-all`;do
+  [ -z "`find FLAIR/$sub -type f`" ] && echo "$sub" >> subjects-flair-missing.txt
+done

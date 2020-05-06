@@ -1,0 +1,116 @@
+#!/bin/bash
+
+cd $1
+unzip -q *.zip
+if [ -f *.pdf ] && [ -f *.txt ];then
+	rm *.{pdf,txt}
+fi
+rm DICOMDIR
+cd DICOM
+# in case there are more than 1 sub-folders under DICOM/
+if [ `ls | wc -l` -gt "1" ];then
+	for folder in `ls| tail -n +2`;do
+		mv $folder/* `ls | head -1`
+		rmdir $folder
+	done
+fi
+
+cd `ls | head -1`
+
+ls | grep ^[0-9] > folders
+# move all DICOM files in one (1st in 'ls') folder
+for folder in `tail -n +2 folders`;do
+	mv $folder/* `head -1 folders`
+	rmdir $folder
+done
+dcm2nii -g N `head -1 folders`/* > dcm2nii.log
+mv `head -1 folders`/*{nii,al,ec} .
+rm -r `head -1 folders` folders
+
+mv *.bval bvals
+mv *.bvec bvecs
+oddfile=`ls *nii | grep '^[[:digit:]]*R.nii$'`
+oddfilename="${oddfile%.*}"
+mv $oddfile ${oddfilename}0.nii
+[ -f "o$oddfile" ] && ( mv o$oddfile o${oddfilename}0.nii )
+[ -f "co$oddfile" ] && ( mv co$oddfile co${oddfilename}0.nii )
+ls -l *nii | awk '{print $5,$9}' | sort > fileinfo
+
+# rename files based on raw size (may fail if there are more than one copy of each sequance, double check)
+mv `grep 104448352 fileinfo | awk '{print $2}'` T2-5echoes.nii
+mv `grep 75013472 fileinfo | awk '{print $2}'` DWIs.nii
+mv `grep 46694752 fileinfo | awk '{print $2}'` rfMRI.nii
+mv `grep 4260192 fileinfo | awk '{print $2}'` 2TEs.nii
+mv `grep 2130272 fileinfo | awk '{print $2}'` FIELDMAP.nii
+mv `grep 2446432 fileinfo | awk '{print $2}'` FA-RGB.nii
+
+i=1
+for file in `grep 1631072 fileinfo | awk '{print $2}'`;do
+	if [ $i -eq "1" ];then
+		mv $file TRACE.nii
+	elif [ $i -eq "2" ];then
+		mv $file MEANDW.nii
+	else
+		mv $file FA.nii
+	fi
+	let "i+=1"
+done
+
+i=1
+for file in `grep 4587872 fileinfo | awk '{print $2}'`;do
+	mv $file FLAIR$i.nii
+	let "i+=1"
+done
+
+i=1
+for file in `grep 62914912 fileinfo | awk '{print $2}' | grep ^o`;do
+	if [ $i -eq "1" ];then
+		mv $file SWI-mag.nii
+	else
+		mv $file SWI-phs.nii
+	fi
+	let "i+=1"
+done
+for file in `grep 62914912 fileinfo | awk '{print $2}' | grep -v ^o`;do
+	rm $file
+done
+
+# size of MPRAGE may vary, but still trackable
+i=1
+for file in `grep ^2'\w\{7\}' fileinfo | awk '{print $2}'`;do
+	if [ $i -eq "1" ];then
+		mv $file MPRAGE-uncorrected-raw.nii
+	elif [ $i -eq "2" ];then
+		mv $file MPRAGE-corrected-raw.nii
+	elif [ $i -eq "3" ];then
+		mv $file MPRAGE-uncorrected-reorn.nii
+	else
+		mv $file MPRAGE-corrected-reorn.nii
+	fi
+	let "i+=1"
+done
+
+i=1
+# the raw size of following files is uncertain, but the file names are (SWI-phs-crop sometimes missing, it's fine anyway)
+for file in `ls co*nii`;do
+	if [ $i -eq "1" ];then
+		mv $file MPRAGE-uncorrected-crop-reorn.nii
+	elif [ $i -eq "2" ];then
+		mv $file MPRAGE-corrected-crop-reorn.nii
+	elif [ $i -eq "3" ];then
+		mv $file SWI-mag-crop.nii
+	else
+		mv $file SWI-phs-crop.nii
+	fi
+	let "i+=1"
+done
+
+gzip *nii
+rm fileinfo
+cd ..
+mv * dcm2nii
+mv dcm2nii ..
+cd ..
+rmdir DICOM
+cd ..
+
